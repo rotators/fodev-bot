@@ -47,8 +47,8 @@ sub new
 		$self->Log( "ERROR UserAgent\n%s", $error );
 	});
 
-	$self->Commands->set;
-	$self->Discord->set;
+	$self->Commands->init;
+	$self->Discord->init;
 
 	return( $self );
 }

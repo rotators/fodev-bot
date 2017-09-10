@@ -80,7 +80,7 @@ sub new
 	return( $self );
 }
 
-sub set
+sub init
 {
 	my( $self ) = @_;
 
@@ -391,7 +391,6 @@ sub OnOp0 # DISPATCH
 	}
 
 	# find OnEventName() and call it
-	# if not found, dump event data to log
 	my $sub = $self->can( $name );
 	if( defined($sub) )
 	{

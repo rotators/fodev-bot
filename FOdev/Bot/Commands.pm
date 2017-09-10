@@ -23,7 +23,7 @@ sub new
 	return( $self );
 }
 
-sub set
+sub init
 {
 	my( $self ) = @_;
 

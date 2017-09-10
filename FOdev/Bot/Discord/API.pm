@@ -21,6 +21,13 @@ sub new
 	return( $self );
 }
 
+sub init
+{
+	my( $self ) = @_;
+
+	return( $self );
+}
+
 ##
 ## get
 ##

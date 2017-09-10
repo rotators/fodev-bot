@@ -28,7 +28,7 @@ sub new
 	return( $self );
 }
 
-sub set
+sub init
 {
 	my( $self ) = @_;
 
@@ -42,8 +42,8 @@ sub set
 		$self->BOT->OnCommand( $self, @args );
 	});
 
-	$self->{api}     = FOdev::Bot::Discord::API->new( $self->BOT );
-	$self->{gateway} = FOdev::Bot::Discord::Gateway->new( $self->BOT )->set;
+	$self->{api}     = FOdev::Bot::Discord::API->new( $self->BOT )->init;
+	$self->{gateway} = FOdev::Bot::Discord::Gateway->new( $self->BOT )->init;
 }
 
 ##
