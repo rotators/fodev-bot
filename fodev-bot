@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Module::Refresh;
+
+use FOdev::Bot;
+
+Module::Refresh->refresh;
+
+my $bot = FOdev::Bot->new;
+
+$bot->Debug( 1 );
+$bot->LogName( 'fodev-bot.log' );
+
+$bot->Commands->on( hotpatch => sub
+{
+	# check script syntax before hotpatching
+
+	use Cwd 'abs_path';
+
+	my $script = abs_path( $0 );
+	my $result = `perl -c $script 2>&1`;
+	if( $result =~ /syntax OK$/ )
+	{
+		$bot->Log( "HOTPATCH" );
+		Module::Refresh->refresh;
+	}
+	else
+	{
+		$bot->Log( "HOTPATCH validation error" );
+		$bot->Log( $result );
+	}
+});
+
+# always last
+$bot->Run;
