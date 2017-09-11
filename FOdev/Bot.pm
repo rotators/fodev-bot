@@ -142,7 +142,13 @@ sub LogToFile
 	{
 		$format = sprintf( $format, @args ) if( scalar(@args) );
 
-		print( $file $format . "\n" );
+		my @time = localtime(time);
+
+		printf( $file "[%02d.%02d.%02d %02d:%02d:%02d] %s\n",
+			$time[3], $time[4]+1, ($time[5] += 1900) % 100,
+			$time[2], $time[1], $time[0],
+			$format );
+
 		close( $file );
 	}
 }
