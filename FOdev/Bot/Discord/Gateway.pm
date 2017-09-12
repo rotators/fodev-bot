@@ -136,9 +136,7 @@ sub Start
 
 	$self->Log( "Starting..." );
 
-	my $resume = $self->DB->Exists( $dbSession, $dbSeq );
-
-	$self->Connect( $resume );
+	$self->Connect( 1 );
 
 	$self->emit( 'start' );
 
@@ -193,7 +191,7 @@ sub Connect
 
 	# info for OP 10 handler that we attempt to resume session
 	# OP 9 handler must take care of switching to OP 2 if resume fails
-	if( $resume )
+	if( $resume && $self->DB->Exists( $dbSession, $dbSeq ))
 	{
 		$self->{cache}{'hello-resume'} = 1;
 	}
@@ -210,6 +208,9 @@ sub Connect
 			$self->Log( 'WebSocket handshake failed!' );
 			return;
 		}
+
+		# start tracking connection status
+		$self->{cache}{connect} = 1;
 
 		$self->{websocket} = $websocket;
 
@@ -231,10 +232,14 @@ sub Disconnect
 {
 	my( $self, $status ) = @_;
 
+	# stop tracking connection status
+	delete( $self->{cache}{connect} );
+
 	if( defined($self->WebSocket) )
 	{
 		$self->Log( "Disconnecting%s",
 			$status ? sprintf( " [status %d]", $status ) : '' );
+
 
 		# see https://tools.ietf.org/html/rfc6455#section-7.4.1
 		#     https://tools.ietf.org/html/rfc6455#section-11.7
@@ -282,6 +287,15 @@ sub OnWebSocketFinish
 		$reason ? sprintf( " [reason %s]", $reason ) : '' );
 
 	$self->StopHeartbeatLoop;
+
+	if( defined( $self->{cache}{connect} ))
+	{
+		$self->Log( "Network error?" );
+		Mojo::IOLoop->timer( 5 => sub
+		{
+			$self->Reconnect( 1 );
+		});
+	}
 }
 
 sub OnWebSocketDrain # debug
@@ -454,8 +468,7 @@ sub OnOp10 # HELLO
 
 	$self->StartHeartbeatLoop( $data->{heartbeat_interval} );
 
-	if( defined($self->{cache}{'hello-resume'}) &&
-	    $self->DB->Exists( $dbSession, $dbSeq )) # paranoicheck
+	if( defined( $self->{cache}{'hello-resume'} ))
 	{
 		$self->SendOpResume;
 	}
