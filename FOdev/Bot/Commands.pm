@@ -38,6 +38,9 @@ sub init
 		$bytes =~ s![\ \t]+$!!;
 		my @args = split( /[\ \t]+/, $bytes );
 		my $cmd = shift( @args );
+
+		return if( !length($cmd) );
+
 		$self->emit( $cmd => @args );
 
 		$self->{read}->start;
