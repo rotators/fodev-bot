@@ -421,9 +421,13 @@ sub OnOp1 # HEARTBEAT
 	$self->SendOpHeartbeat;
 }
 
-sub OnOp7_ # RECONNECT
+sub OnOp7 # RECONNECT
 {
 	my( $self, $data ) = @_;
+
+	$self->Log( "Reconnecting (gateway request)" );
+
+	$self->Reconnect;
 }
 
 sub OnOp9 # INVALID_SESSION
